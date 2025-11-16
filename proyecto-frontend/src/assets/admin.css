@@ -1,0 +1,248 @@
+/* ADMIN */
+
+.admin-main {
+    display: flex;
+    min-height: calc(100vh - 5rem - 64px); /* Ajustado para el tamaño del header/footer */
+    max-width: 1200px;
+    margin: 40px auto;
+    background-color: rgba(255, 255, 255, 0.96);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    overflow: hidden;
+    position: relative;
+    z-index: 2; /* Asegura que esté sobre el filtro oscuro */
+}
+
+.sidebar {
+    width: 250px;
+    background-color: rgba(250, 250, 250, 0.95);
+    padding: 20px;
+    border-right: 1px solid #ddd;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+}
+
+.sidebar h2 {
+    color: #572364;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul li a {
+    display: block;
+    padding: 15px 10px;
+    color: #333;
+    text-decoration: none;
+    font-size: 1.1rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    border-radius: 5px;
+}
+
+.sidebar ul li a:hover,
+.sidebar ul li a.active {
+    background-color: #572364;
+    color: white;
+}
+
+.admin-content {
+    flex-grow: 1;
+    padding: 40px;
+    background-color: rgba(255, 255, 255, 0.96);
+    position: relative;
+    z-index: 2;
+}
+
+.admin-content h1,
+.admin-content h2 {
+    color: #333;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 5px;
+}
+
+.admin-btn {
+    background-color: #572364;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-bottom: 20px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.admin-btn:hover {
+    background-color: #842593;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+.admin-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 600px;
+    margin-bottom: 40px;
+}
+
+.admin-form label {
+    font-weight: bold;
+    color: #555;
+}
+
+.admin-form input[type="text"],
+.admin-form input[type="number"],
+.admin-form textarea,
+.admin-form select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    background-color: rgba(255,255,255,0.9);
+}
+
+.admin-form textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.table-container {
+    max-height: 500px; /* Ajusta la altura máxima según sea necesario */
+    overflow-y: auto;
+    margin-top: 20px;
+    position: relative;
+    z-index: 2;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+thead tr {
+    background-color: #572364;
+    color: white;
+}
+
+tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+.acciones-btn {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-right: 5px;
+}
+
+.edit-btn {
+    background-color: #2196F3;
+    color: white;
+}
+
+.delete-btn {
+    background-color: #f44336;
+    color: white;
+}
+
+/* ==== Prevención de bloqueo por filtro global ==== */
+.layout-filtro-oscuro {
+    pointer-events: none;
+    z-index: 0 !important;
+}
+
+.layout-con-fondo > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* ==== RESPONSIVE ==== */
+@media (max-width: 768px) {
+    .admin-main {
+        flex-direction: column;
+        margin: 20px 10px;
+    }
+
+    .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .admin-content {
+        padding: 20px;
+    }
+
+    .sidebar ul {
+        display: flex;
+        justify-content: space-around;
+        padding-bottom: 10px;
+    }
+}
+/* === CORRECCIÓN PARA LAYOUT EN FILA === */
+
+.admin-main {
+  display: flex;
+  flex-direction: row; /* fuerza disposición horizontal */
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0;
+  min-height: calc(100vh - 5rem - 64px);
+  max-width: 1200px;
+  margin: 40px auto;
+  background-color: rgba(255, 255, 255, 0.96);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+}
+
+.sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  background-color: rgba(250, 250, 250, 0.95);
+  padding: 25px;
+  border-right: 1px solid #ddd;
+  height: auto;
+}
+
+.admin-content {
+  flex-grow: 1;
+  padding: 40px;
+  background-color: rgba(255, 255, 255, 0.96);
+  height: 100%;
+}
+
+/* RESPONSIVE: en móviles se apila de nuevo */
+@media (max-width: 768px) {
+  .admin-main {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+  }
+}

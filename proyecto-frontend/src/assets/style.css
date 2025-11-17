@@ -4,28 +4,28 @@
     box-sizing: border-box;
 }
 
-html, body {
+html {
     height: 100%;
 }
 
 body {
     font-family: 'Lucida Grande', Tahoma, Verdana, Arial, sans-serif;
-    background-color: #f0f2f5;
+    background-color: #1a1a1a;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    /* si usas la ruta /images/PosterGaleria.jpg */
+    margin: 0;
+    padding: 0;
     background-image: url('/images/PosterGaleria.jpg');
     background-size: cover;
-    background-position: center;
-    position: relative;
+    background-position: center top;
+    background-attachment: fixed;
+    background-repeat: repeat;
 }
 
 /* -----------------------
    FILTRO OSCURO (fix)
    -----------------------
-   - pointer-events: none -> deja pasar clicks/hovers
-   - z-index: 0 para que el contenido con z-index:1 esté por encima
 */
 body::before {
     content: '';
@@ -34,7 +34,10 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.55); /* puedes ajustar opacidad */
+    background-color: rgba(0, 0, 0, 0.55);
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
     z-index: 0; 
     pointer-events: none;
 }
@@ -45,6 +48,7 @@ header, main, footer, .contact-hero-content, .detalle-container, .product-info, 
     z-index: 1;
 }
 
+/* CAMBIO: Separar el header del hero */
 header {
     background: linear-gradient(to bottom, #572364 0%, #572346 50%, #842593 100%);
     border-bottom: 1px solid #2d4373;
@@ -55,7 +59,7 @@ header {
     padding: 0 20px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     position: relative;
-    z-index: 1; 
+    z-index: 10; /* Mayor z-index para que esté siempre arriba */
 }
 
 .logo::before {
@@ -95,29 +99,38 @@ nav ul li a:hover {
     box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
-/* Contenido principal */
+/* CAMBIO: Contenido principal con flex: 1 para empujar el footer al fondo */
 main {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     width: 100%;
-    position:relative;
+    position: relative;
     z-index: 1;
+    padding: 20px 0 40px; /* Padding top y bottom */
+    min-height: calc(100vh - 5rem - 100px); /* Altura mínima menos header y footer aproximado */
 }
 
+/* CAMBIO: Hero separado del header, centrado en la página */
 .hero {
     text-align: center;
-    margin-bottom: 50px;
-    width: 100%;
+    padding: 60px 20px; /* Más padding vertical */
     color: white; 
+    background: rgba(87, 35, 100, 0.85); /* Fondo morado más opaco */
+    margin: 20px auto 50px; /* Margen superior e inferior */
+    border-radius: 8px;
+    max-width: 1200px;
+    width: 90%; /* Ancho responsivo */
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3); /* Sombra para destacar */
 }
 
 .hero h1 {
     color: white; 
-    font-size: 36px;
+    font-size: 42px; /* Título más grande */
     margin-bottom: 20px;
+    font-weight: bold;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
 .hero p {
@@ -126,20 +139,20 @@ main {
     max-width: 800px;
     margin: 0 auto;
     line-height: 1.6;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
 .features {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 30px;
-    margin-top: 50px;
+    margin-top: 0; /* Removido margen superior ya que el hero lo provee */
     max-width: 1200px; 
-    padding: 0 20px; 
+    padding: 0 20px 40px; /* Padding inferior añadido */
 }
 
 .feature-card {
-    /* importante: tarjetas opacas sobre fondo */
-    background: rgba(255, 255, 255, 0.85); 
+    background: rgba(255, 255, 255, 0.9); /* Más opaco */
     border-radius: 8px;
     padding: 25px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -819,15 +832,17 @@ main {
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-/* Footer */
+/* CAMBIO: Footer siempre al fondo */
 .footer {
     background-color: #171a21;
     color: #c6d4df;
-    padding: 30px 20px;
+    padding: 20px 20px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin-top: auto;
     position: relative;
     z-index: 1;
+    width: 100%;
+    flex-shrink: 0; /* Evita que el footer se comprima */
 }
 
 .footer-content {
@@ -839,7 +854,6 @@ main {
     align-items: center;
     gap: 20px;
 }
-
 
 .footer-links {
     display: flex;
@@ -887,14 +901,14 @@ main {
 @media (max-width: 768px) {
     header {
         padding: 0 10px;
-        height: 70px;
-        flex-direction: column;
-        justify-content: center;
+        height: auto;
+        min-height: 70px;
+        flex-direction: row; /* CAMBIO: mantener horizontal en móvil */
+        justify-content: space-between;
     }
 
     .logo::before {
         font-size: 24px;
-        margin-bottom: 5px;
     }
 
     nav ul {
@@ -906,12 +920,8 @@ main {
         padding: 6px 8px;
     }
 
-    main {
-        padding: 20px 15px;
-    }
-
     .hero h1 {
-        font-size: 28px;
+        font-size: 32px;
     }
 
     .hero p {
@@ -933,6 +943,7 @@ main {
     header {
         height: auto;
         padding: 10px;
+        flex-direction: column;
     }
 
     nav ul {
@@ -946,7 +957,7 @@ main {
     }
 
     .hero h1 {
-        font-size: 24px;
+        font-size: 28px;
     }
 }
 .blog-detalle-hero {
@@ -1167,23 +1178,17 @@ main {
 /* ==================================
    NUEVO LAYOUT CON FONDO (React Way)
    ================================== */
-/* Si usas este layout en React, estas clases quedan disponibles.
-   Importante: NO dupliques body::before en el layout; usamos aquí
-   una versión inofensiva (z-index y pointer-events ya están fijados arriba). */
-
 .layout-con-fondo {
   min-height: 100vh;
   background-image: url('/PosterGaleria.jpg'); 
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
+  background-repeat: repeat;
   isolation: isolate;
   position: relative;
 }
 
-/* filtro en layout: dejamos z-index 0 y pointer-events none para que
-   no bloquee. No debe colocarse con z-index: -1 porque eso puede generar
-   comportamientos distintos en algunos navegadores/contexts */
 .layout-filtro-oscuro {
   position: absolute;
   top: 0;
@@ -1195,35 +1200,27 @@ main {
   pointer-events: none;
 }
 
-/* Aseguramos que el contenido interno del layout esté arriba */
 .layout-con-fondo > * {
   position: relative;
   z-index: 1;
 }
 
 /* ==================================
-   FIN LAYOUT
-   ================================== */
-
-   /* ==================================
-   ESTILOS DEL CARRITO (NUEVO)
+   ESTILOS DEL CARRITO
    ================================== */
 
 .cart-outer {
     padding: 20px;
     max-width: 1200px;
-    margin: 40px auto; /* Añadido margen superior/inferior */
+    margin: 40px auto;
     width: 100%;
 }
 
 .cart-super-container {
-    /* ¡FIX! Cambiado de rgba(255, 255, 255, 0.9) a un fondo sólido */
     background: #f9f9f9; 
     padding: 30px;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-
-    /* ¡FIX! Añadido para que flote sobre el filtro oscuro */
     position: relative;
     z-index: 1; 
 }
@@ -1250,7 +1247,7 @@ main {
     padding: 12px;
     text-align: left;
     border-bottom: 1px solid #ddd;
-    color: #333; /* Color de texto oscuro */
+    color: #333;
 }
 
 .cart-table th {
@@ -1266,7 +1263,7 @@ main {
 }
 
 .cart-items p {
-    color: #333; /* Asegura que el texto de "carrito vacío" sea legible */
+    color: #333;
 }
 
 .cart-summary {
@@ -1274,7 +1271,7 @@ main {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    height: fit-content; /* Para que no se estire */
+    height: fit-content;
     color: #333;
 }
 
@@ -1325,7 +1322,6 @@ main {
     background: linear-gradient(to bottom, #a66bbe 0%, #8d309c 50%, #753a8c 100%);
 }
 
-/* Media query para hacer el carrito responsive */
 @media (max-width: 900px) {
     .cart-main {
         grid-template-columns: 1fr;

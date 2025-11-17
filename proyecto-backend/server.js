@@ -9,7 +9,7 @@ const mongoose = require('mongoose');
 
 // ✅ NUEVO: Importación de Transbank
 // ✅ CORRECTO
-const { WebpayPlus, IntegrationApiKeys, IntegrationCommerceCodes, Environment } = require('transbank-sdk');
+const { WebpayPlus, Options,IntegrationApiKeys, IntegrationCommerceCodes, Environment } = require('transbank-sdk');
 
 /* ==================================
  * INICIALIZACIÓN Y CONEXIÓN A BD
@@ -35,9 +35,10 @@ connectDB();
  * ✅ NUEVO: CONFIGURACIÓN DE TRANSBANK
  * ================================== */
 const tbk = new WebpayPlus.Transaction(
-    IntegrationCommerceCodes.WEBPAY_PLUS,
+    new Options(IntegrationCommerceCodes.WEBPAY_PLUS,
     IntegrationApiKeys.WEBPAY, // Se usa .WEBPAY
-    Environment.Integration
+    Environment.Integration)
+    
 );
 
 /* ==================================
@@ -348,7 +349,8 @@ app.post('/api/pay', async (req, res) => {
     const buyOrder = `BO-${Date.now()}`;
     const sessionId = `SID-${Date.now()}`;
     const amount = Math.round(total);
-    const returnUrl = 'http://localhost:3000/payment-result';
+    const returnUrl = "http://localhost:5173/payment-result";
+    console.log(buyOrder, sessionId, amount, returnUrl)
 
     const newOrder = new Order({
       userName,
@@ -358,8 +360,10 @@ app.post('/api/pay', async (req, res) => {
       buyOrder,
       sessionId
     });
-    
+    console.log(returnUrl)
     const createResponse = await tbk.create(buyOrder, sessionId, amount, returnUrl);
+
+    console.log(createResponse)
 
     newOrder.token = createResponse.token;
     await newOrder.save();

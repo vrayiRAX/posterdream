@@ -10,43 +10,44 @@ function PaymentResultPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // 1. Obtener el token de la URL
-    const token = searchParams.get('token_ws');
-
-    if (!token) {
-      setError('No se encontró un token de Webpay.');
+    // 1. Obtener los tokens de la URL
+    const successToken = searchParams.get('token_ws');
+    const failureToken = searchParams.get('TBK_TOKEN'); // ¡El token de "cancelado"!
+    
+    // --- CASO 1: El usuario CANCELÓ el pago ---
+    if (failureToken) {
+      setError('El pago fue cancelado por el usuario.');
       setLoading(false);
-      return;
+      return; // No hacemos nada más
     }
 
-    // 2. Función para confirmar el pago en el backend
-    const commitPayment = async (token) => {
-      try {
-        // Llamamos al endpoint del backend que confirma con Transbank
-        // Usamos el puerto 5000, el mismo de tu backend actual
-        const res = await axios.post('http://localhost:5000/api/commit', { token });
-        
-        // El backend nos devuelve el resultado de Transbank
-        setResult(res.data);
+    // --- CASO 2: El usuario SÍ pagó (o al menos lo intentó) ---
+    if (successToken) {
+      const commitPayment = async (token) => {
+        try {
+          const res = await axios.post('http://localhost:5000/api/commit', { token });
+          setResult(res.data);
+        } catch (err) {
+          setError(err.response?.data?.error || err.message || 'Error al confirmar el pago');
+        } finally {
+          setLoading(false);
+        }
+      };
+      commitPayment(successToken);
+      return; // Salimos para que no siga al Caso 3
+    }
+    
+    // --- CASO 3: El usuario llegó aquí sin NINGÚN token ---
+    setError('No se encontró un token de Webpay válido.');
+    setLoading(false);
 
-      } catch (err) {
-        setError(err.response?.data?.error || err.message || 'Error al confirmar el pago');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    commitPayment(token);
   }, [searchParams]);
 
-  // 3. Función para "formatear" el resultado y mostrarlo
+  // (El resto de tu archivo, como "getPaymentDetails", sigue igual)
   const getPaymentDetails = () => {
-    if (!result) return <p>No hay detalles de pago.</p>;
+    if (!result) return null;
 
-    // Si responseCode es 0, el pago fue exitoso
     const isSuccess = result.responseCode === 0;
-
-    // Estilos simples para el resultado
     const boxStyle = {
       padding: '20px',
       border: `2px solid ${isSuccess ? 'green' : 'red'}`,
@@ -79,8 +80,8 @@ function PaymentResultPage() {
           
           <button 
             className="cart-btn" 
+            style={{marginTop: '20px'}}
             onClick={() => navigate('/home')} 
-            style={{ marginTop: '20px' }}
           >
             Volver al Inicio
           </button>

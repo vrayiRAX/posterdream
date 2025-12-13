@@ -1,82 +1,378 @@
-// server.js - Versión modificada para funcionar en Render y localmente
+/* ==================================
+ * IMPORTACIONES
+ * ================================== */
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
-const dotenv = require('dotenv');
-const path = require('path');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
+const { WebpayPlus, Options, IntegrationApiKeys, IntegrationCommerceCodes, Environment } = require('transbank-sdk');
 
-// Cargar variables de entorno
-dotenv.config();
-
+/* ==================================
+ * INICIALIZACIÓN Y CONEXIÓN A BD
+ * ================================== */
 const app = express();
- 
-// 1. CORS - Permite conexiones desde cualquier origen (para desarrollo y producción)
-// ¡IMPORTANTE! En producción podrías restringir esto solo a tu dominio de Render
-app.use(cors({
-  origin: '*', // Permite todas las conexiones
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'x-auth-token']
-}));
 
-// Middleware para parsear JSON
-app.use(express.json());
-
-// 2. Conectar a MongoDB Atlas
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/posterdream', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => console.log('✅ Conectado a MongoDB Atlas'))
-.catch(err => console.error('❌ Error conectando a MongoDB:', err));
-
-// 3. Importar rutas (ajusta según tu estructura)
-const authRoutes = require('./Routes/auth');
-const productoRoutes = require('./Routes/productos');
-const carritoRoutes = require('./Routes/carrito');
-const blogRoutes = require('./Routes/blogs');
-const userRoutes = require('./Routes/users');
-const paymentRoutes = require('./Routes/payment');
-
-// 4. Usar rutas
-app.use('/api/auth', authRoutes);
-app.use('/api/productos', productoRoutes);
-app.use('/api/carrito', carritoRoutes);
-app.use('/api/blogs', blogRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/pay', paymentRoutes);
-app.use('/api/commit', paymentRoutes);
-
-// 5. Ruta de prueba
-app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'ok', 
-    message: 'Backend funcionando correctamente',
-    timestamp: new Date().toISOString()
-  });
-});
-
-// 6. Manejar rutas no encontradas
-app.use('*', (req, res) => {
-  res.status(404).json({ error: 'Ruta no encontrada' });
-});
-
-// 7. Manejo de errores global
-app.use((err, req, res, next) => {
-  console.error('❌ Error:', err.stack);
-  res.status(500).json({ 
-    error: 'Algo salió mal en el servidor',
-    message: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
-});
-
-// 8. Puerto dinámico para Render
-// Render asigna un puerto aleatorio, no podemos usar 5000 fijo
+// 1. PUERTO PARA RENDER (CAMBIO OBLIGATORIO)
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor funcionando en puerto ${PORT}`);
-  console.log(`🌐 Entorno: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔗 URL: http://localhost:${PORT}`);
+const JWT_SECRET = 'mi-clave-secreta-para-tokens-123';
+
+// Tu base de datos original
+const MONGO_URI = "mongodb+srv://viplat:572364@posterdream.dialyf6.mongodb.net/PosterDream?retryWrites=true&w=majority";
+
+const connectDB = async () => {
+    try {
+        await mongoose.connect(MONGO_URI);
+        console.log('¡Base de datos MongoDB conectada con éxito!');
+    } catch (err) {
+        console.error('Error al conectar a MongoDB:', err.message);
+        process.exit(1);
+    }
+};
+connectDB();
+
+/* ==================================
+ * CONFIGURACIÓN DE TRANSBANK
+ * ================================== */
+const tbk = new WebpayPlus.Transaction(
+    new Options(IntegrationCommerceCodes.WEBPAY_PLUS,
+    IntegrationApiKeys.WEBPAY,
+    Environment.Integration)
+);
+
+/* ==================================
+ * MODELOS (Tu código original)
+ * ================================== */
+
+const UserSchema = new mongoose.Schema({
+    nombre: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    rut: { type: String, required: true },
+    direccion: { type: String, required: true },
+    isAdmin: { type: Boolean, default: false }
+});
+const User = mongoose.model('User', UserSchema);
+
+const ProductSchema = new mongoose.Schema({
+    nombre: { type: String, required: true },
+    precio: { type: Number, required: true },
+    imagen: { type: String, required: true },
+    categoria: { type: String, required: true },
+    descripcion: { type: String, default: "" }
+}, { timestamps: true });
+const Product = mongoose.model('Product', ProductSchema);
+
+const BlogSchema = new mongoose.Schema({
+    titulo: { type: String, required: true },
+    fecha: { type: String, required: true },
+    autor: { type: String, required: true },
+    imagen: { type: String },
+    contenido: { type: String, required: true }
+}, { timestamps: true });
+const Blog = mongoose.model('Blog', BlogSchema);
+
+const CarritoSchema = new mongoose.Schema({
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
+    items: [
+        {
+            producto: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+            cantidad: { type: Number, required: true, min: 1, default: 1 }
+        }
+    ]
+}, { timestamps: true });
+const Carrito = mongoose.model('Carrito', CarritoSchema);
+
+const OrderSchema = new mongoose.Schema({
+    userName: { type: String, required: true },
+    email: { type: String, required: true },
+    total: { type: Number, required: true },
+    status: { 
+        type: String, 
+        required: true, 
+        default: 'pending',
+        enum: ['pending', 'paid', 'failed']
+    },
+    token: { type: String, default: null },
+    buyOrder: { type: String, required: true, unique: true },
+    sessionId: { type: String, required: true },
+    paymentResult: { type: Object, default: null }
+}, { timestamps: true });
+const Order = mongoose.model('Order', OrderSchema);
+
+/* ==================================
+ * MIDDLEWARES
+ * ================================== */
+app.use(cors()); // Permite todo (ideal para que no falle conexión front-back)
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+const authMiddleware = (req, res, next) => {
+    const token = req.header('x-auth-token');
+    if (!token) return res.status(401).json({ message: 'No hay token, permiso denegado' });
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        req.usuario = decoded.usuario;
+        next();
+    } catch (err) {
+        res.status(401).json({ message: 'Token no es válido' });
+    }
+};
+
+const adminMiddleware = (req, res, next) => {
+    if (!req.usuario || !req.usuario.isAdmin) {
+        return res.status(403).json({ message: 'Acceso denegado.' });
+    }
+    next();
+};
+
+/* ==================================
+ * RUTAS (Tu código original)
+ * ================================== */
+
+// 1. Productos y Blogs
+app.get('/api/productos', async (req, res) => {
+    try {
+        const productos = await Product.find().sort({ createdAt: -1 });
+        res.json(productos);
+    } catch (err) { res.status(500).json({ message: 'Error en el servidor' }); }
 });
 
-module.exports = app; // Para testing
+app.get('/api/productos/:id', async (req, res) => {
+    try {
+        const producto = await Product.findById(req.params.id);
+        if (!producto) return res.status(404).json({ message: 'Producto no encontrado' });
+        res.json(producto);
+    } catch (err) { res.status(500).json({ message: 'Error de servidor o ID inválido' }); }
+});
+
+app.get('/api/blogs', async (req, res) => {
+    try {
+        const blogs = await Blog.find().sort({ createdAt: -1 });
+        res.json(blogs);
+    } catch (err) { res.status(500).json({ message: 'Error en el servidor' }); }
+});
+
+app.get('/api/blogs/:id', async (req, res) => {
+    try {
+        const blog = await Blog.findById(req.params.id);
+        if (!blog) return res.status(404).json({ message: 'Artículo no encontrado' });
+        res.json(blog);
+    } catch (err) { res.status(500).json({ message: 'Error de servidor o ID inválido' }); }
+});
+
+// 2. Auth
+app.post('/api/auth/register', async (req, res) => {
+    try {
+        const { nombre, email, password, rut, direccion } = req.body;
+        let usuario = await User.findOne({ email });
+        if (usuario) return res.status(400).json({ message: 'El email ya está registrado.' });
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        usuario = new User({
+            nombre, email, password: hashedPassword, rut, direccion,
+            isAdmin: (await User.countDocuments()) === 0
+        });
+        await usuario.save();
+        res.status(201).json({ message: '¡Usuario registrado con éxito!' });
+    } catch (error) { res.status(500).json({ message: 'Error en el servidor.' }); }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const usuario = await User.findOne({ email });
+        if (!usuario) return res.status(400).json({ message: 'Email o contraseña incorrectos.' });
+
+        const isMatch = await bcrypt.compare(password, usuario.password);
+        if (!isMatch) return res.status(400).json({ message: 'Email o contraseña incorrectos.' });
+
+        const payload = { usuario: { id: usuario.id, nombre: usuario.nombre, isAdmin: usuario.isAdmin } };
+        jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
+            if (err) throw err;
+            res.json({ token, isAdmin: usuario.isAdmin });
+        });
+    } catch (error) { res.status(500).json({ message: 'Error en el servidor.' }); }
+});
+
+// 3.5. NUEVA RUTA: Ver Perfil del Usuario Logeado (LA QUE AGREGAMOS HOY)
+app.get('/api/auth/me', authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findById(req.usuario.id).select('-password');
+        if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
+        res.json(user); 
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Error del servidor' });
+    }
+});
+
+// 3. Carrito
+app.get('/api/carrito', authMiddleware, async (req, res) => {
+    try {
+        const carrito = await Carrito.findOne({ user: req.usuario.id }).populate('items.producto');
+        if (!carrito) return res.json([]);
+        res.json(carrito.items);
+    } catch (err) { res.status(500).json({ message: 'Error en el servidor' }); }
+});
+
+app.post('/api/carrito/agregar', authMiddleware, async (req, res) => {
+    const { productoId } = req.body;
+    const userId = req.usuario.id;
+    try {
+        let carrito = await Carrito.findOne({ user: userId });
+        if (!carrito) carrito = new Carrito({ user: userId, items: [] });
+
+        const itemExistente = carrito.items.find(item => item.producto.toString() === productoId);
+        if (itemExistente) itemExistente.cantidad += 1;
+        else carrito.items.push({ producto: productoId, cantidad: 1 });
+
+        await carrito.save();
+        res.status(200).json({ message: 'Producto añadido al carrito' });
+    } catch (err) { res.status(500).json({ message: 'Error en el servidor' }); }
+});
+
+app.delete('/api/carrito/eliminar/:productoId', authMiddleware, async (req, res) => {
+    const { productoId } = req.params;
+    const userId = req.usuario.id;
+    try {
+        const carrito = await Carrito.findOne({ user: userId });
+        if (carrito) {
+            carrito.items = carrito.items.filter(item => item.producto.toString() !== productoId);
+            await carrito.save();
+        }
+        res.status(200).json({ message: 'Producto eliminado del carrito' });
+    } catch (err) { res.status(500).json({ message: 'Error en el servidor' }); }
+});
+
+app.delete('/api/carrito/vaciar', authMiddleware, async (req, res) => {
+    const userId = req.usuario.id;
+    try {
+        await Carrito.findOneAndUpdate({ user: userId }, { $set: { items: [] } });
+        res.status(200).json({ message: 'Carrito vaciado con éxito' });
+    } catch (err) { res.status(500).json({ message: 'Error en el servidor' }); }
+});
+
+// 4. Admin
+app.post('/api/productos', [authMiddleware, adminMiddleware], async (req, res) => {
+    const { nombre, precio, imagen, categoria, descripcion } = req.body;
+    const nuevoProducto = new Product({ nombre, precio: parseFloat(precio), imagen, categoria, descripcion });
+    const productoGuardado = await nuevoProducto.save();
+    res.status(201).json(productoGuardado);
+});
+
+app.delete('/api/productos/:id', [authMiddleware, adminMiddleware], async (req, res) => {
+    const producto = await Product.findById(req.params.id);
+    if (!producto) return res.status(404).json({ message: 'Producto no encontrado' });
+    await producto.deleteOne();
+    res.status(200).json({ message: 'Producto eliminado con éxito' });
+});
+
+app.put('/api/productos/:id', [authMiddleware, adminMiddleware], async (req, res) => {
+    const producto = await Product.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true });
+    if (!producto) return res.status(404).json({ message: 'Producto no encontrado' });
+    res.status(200).json(producto);
+});
+
+app.get('/api/users', [authMiddleware, adminMiddleware], async (req, res) => {
+    const users = await User.find().select('-password');
+    res.json(users);
+});
+
+app.delete('/api/users/:id', [authMiddleware, adminMiddleware], async (req, res) => {
+    if (req.params.id === req.usuario.id) return res.status(400).json({ message: 'No puedes eliminar tu propia cuenta.' });
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
+    await user.deleteOne();
+    res.status(200).json({ message: 'Usuario eliminado con éxito' });
+});
+
+app.put('/api/users/toggle-admin/:id', [authMiddleware, adminMiddleware], async (req, res) => {
+    if (req.params.id === req.usuario.id) return res.status(400).json({ message: 'No puedes cambiar tu propio estado.' });
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
+    user.isAdmin = !user.isAdmin;
+    await user.save();
+    res.status(200).json({ message: 'Estado de admin actualizado' });
+});
+
+// 7. WEBPAY (ARREGLADO PARA RENDER)
+app.post('/api/pay', async (req, res) => {
+  const { userName, email, total } = req.body;
+
+  try {
+    if (!userName || !email || !total) {
+      return res.status(400).json({ error: 'Faltan datos para crear la orden' });
+    }
+
+    const buyOrder = `BO-${Date.now()}`;
+    const sessionId = `SID-${Date.now()}`;
+    const amount = Math.round(total);
+    
+    // 2. CAMBIO IMPORTANTE: URL DE RETORNO
+    // Si estamos en Render, usar la URL del frontend de Render. Si no, Localhost.
+    const frontendUrl = 'https://posterdream-frontend.onrender.com';
+    const returnUrl = `${frontendUrl}/payment-result`;
+    
+    console.log("Iniciando Webpay...", buyOrder, amount, returnUrl);
+
+    const newOrder = new Order({
+      userName, email, total: amount, status: 'pending',
+      buyOrder, sessionId
+    });
+    
+    const createResponse = await tbk.create(buyOrder, sessionId, amount, returnUrl);
+
+    newOrder.token = createResponse.token;
+    await newOrder.save();
+
+    res.json({
+      url: createResponse.url,
+      token: createResponse.token
+    });
+
+  } catch (error) {
+    console.error("Error al crear pago en Webpay:", error);
+    res.status(500).json({ error: 'Error al iniciar el pago', details: error.message });
+  }
+});
+
+app.post('/api/commit', async (req, res) => {
+  const { token } = req.body;
+  if (!token) return res.status(400).json({ error: 'No se proporcionó token' });
+
+  let order;
+  try {
+    order = await Order.findOne({ token: token });
+    if (!order) return res.status(404).json({ error: 'Orden no encontrada' });
+
+    const commitResponse = await tbk.commit(token);
+    order.paymentResult = commitResponse;
+
+    if (commitResponse.responseCode === 0) {
+      order.status = 'paid';
+    } else {
+      order.status = 'failed';
+    }
+    await order.save();
+    res.json(commitResponse);
+  } catch (error) {
+    console.error("Error al confirmar pago en Webpay:", error);
+    if (order) {
+      order.status = 'failed';
+      order.paymentResult = { error: error.message };
+      await order.save();
+    }
+    res.status(500).json({ error: 'Error al confirmar el pago', details: error.message });
+  }
+});
+
+/* ==================================
+ * ENCENDER EL SERVIDOR
+ * ================================== */
+app.listen(PORT, () => {
+    console.log(`¡Servidor Backend corriendo en el puerto ${PORT}`);
+});

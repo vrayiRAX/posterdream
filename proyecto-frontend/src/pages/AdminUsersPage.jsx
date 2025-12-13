@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_URL } from '../config';
 
 function AdminUsersPage() {
   const [users, setUsers] = useState([]);
@@ -9,7 +10,7 @@ function AdminUsersPage() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/users', {
+      const res = await fetch(`${API_URL}/api/users`, {
         headers: { 'x-auth-token': token }
       });
       const data = await res.json();
@@ -33,7 +34,7 @@ function AdminUsersPage() {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:5000/api/users/${userId}`, {
+      const res = await fetch(`${API_URL}/api/users/${userId}`, {
         method: 'DELETE',
         headers: { 'x-auth-token': token }
       });
@@ -52,7 +53,7 @@ function AdminUsersPage() {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:5000/api/users/toggle-admin/${userId}`, {
+      const res = await fetch(`${API_URL}/api/users/toggle-admin/${userId}`, {
         method: 'PUT',
         headers: { 'x-auth-token': token }
       });

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios'; // ¡NUEVO! Importamos axios
+import axios from 'axios';
+import { API_URL } from '../config';
 
 function CarritoPage() {
   const [carrito, setCarrito] = useState([]);
@@ -23,7 +24,7 @@ function CarritoPage() {
     }
     try {
       setLoading(true);
-      const res = await fetch('http://localhost:5000/api/carrito', {
+      const res = await fetch(`${API_URL}/api/carrito`, {
         headers: { 'x-auth-token': token }
       });
       if (!res.ok) throw new Error('Error al cargar el carrito');
@@ -51,7 +52,7 @@ function CarritoPage() {
   const handleEliminarItem = async (productoId) => {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch(`http://localhost:5000/api/carrito/eliminar/${productoId}`, {
+      const res = await fetch(`${API_URL}/api/carrito/eliminar/${productoId}`, {
         method: 'DELETE',
         headers: { 'x-auth-token': token }
       });
@@ -69,7 +70,7 @@ function CarritoPage() {
     
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch('http://localhost:5000/api/carrito/vaciar', {
+      const res = await fetch(`${API_URL}/api/carrito/vaciar`, {
         method: 'DELETE',
         headers: { 'x-auth-token': token }
       });
@@ -103,7 +104,7 @@ function CarritoPage() {
     try {
       // 1. Llamamos a nuestro backend para crear la transacción
       // Usamos el puerto 5000, el mismo de tu backend actual
-      const res = await axios.post('http://localhost:5000/api/pay', {
+      const res = await axios.post(`${API_URL}/api/pay`, {
         userName,
         email,
         total // Usamos el 'total' que ya calculaste

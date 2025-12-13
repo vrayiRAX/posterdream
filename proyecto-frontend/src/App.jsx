@@ -11,6 +11,7 @@ import BlogsPage from './pages/BlogsPage';
 import BlogDetailPage from './pages/BlogDetailPage';
 import CarritoPage from './pages/CarritoPage';
 import PaymentResultPage from './pages/PaymentResultPage'; 
+import ProfilePage from './pages/ProfilePage'; // <--- NUEVA IMPORTACIÓN
 import MainLayout from './components/MainLayout';
 import AdminLayout from './components/AdminLayout';
 import AdminDashboardPage from './pages/AdminDashboardPage';
@@ -39,6 +40,9 @@ function App() {
 
         {/* Ruta de resultado de Webpay*/}
         <Route path="/payment-result" element={<PaymentResultPage />} />
+
+        {/* Ruta de Perfil (Nueva) */}
+        <Route path="/perfil" element={<ProfilePage />} /> {/* <--- NUEVA RUTA */}
 
         {/*Rutas de Admin*/}
         <Route path="/admin" element={<AdminLayout />}>

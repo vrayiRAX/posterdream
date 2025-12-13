@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'; // ¡Importamos hooks!
 import { Link, useParams } from 'react-router-dom';
+import { API_URL } from '../config';
 
 function BlogDetailPage() {
   // 1. Leemos el ID de la URL
@@ -14,7 +15,7 @@ function BlogDetailPage() {
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/blogs/${id}`);
+        const res = await fetch(`${API_URL}/api/blogs/${id}`);
         if (!res.ok) throw new Error('Artículo no encontrado');
         const data = await res.json();
         setBlog(data);

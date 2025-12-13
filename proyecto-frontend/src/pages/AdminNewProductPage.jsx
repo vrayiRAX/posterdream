@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Para redirigir
+import { useNavigate } from 'react-router-dom';
+import { API_URL } from '../config';
 
 function AdminNewProductPage() {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ function AdminNewProductPage() {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/productos', {
+      const res = await fetch(`${API_URL}/api/productos`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

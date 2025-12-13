@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'; // ¡Importamos hooks!
 import { Link } from 'react-router-dom';
+import { API_URL } from '../config';
 
 function BlogsPage() {
   // 1. Creamos estados para guardar los blogs
@@ -10,7 +11,7 @@ function BlogsPage() {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/blogs');
+        const res = await fetch(`${API_URL}/api/blogs`);
         const data = await res.json();
         setBlogs(data); // Guardamos los blogs del backend
       } catch (error) {

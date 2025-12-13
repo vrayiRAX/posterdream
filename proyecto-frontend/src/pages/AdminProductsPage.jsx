@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { API_URL } from '../config';
 
 function AdminProductsPage() {
   // 1. Estados para guardar los productos y el estado de carga
@@ -10,7 +11,7 @@ function AdminProductsPage() {
   const fetchProductos = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/productos');
+      const res = await fetch(`${API_URL}/api/productos`);
       const data = await res.json();
       setProductos(data); // Guardamos los productos reales
     } catch (error) {
@@ -34,7 +35,7 @@ function AdminProductsPage() {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:5000/api/productos/${productoId}`, {
+      const res = await fetch(`${API_URL}/api/productos/${productoId}`, {
         method: 'DELETE',
         headers: {
           'x-auth-token': token // ¡Enviamos el token de admin!

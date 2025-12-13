@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import axios from 'axios'; // Asegúrate de tenerlo: npm install axios
+import axios from 'axios';
+import { API_URL } from '../config';
 
 function PaymentResultPage() {
   const [searchParams] = useSearchParams();
@@ -25,7 +26,7 @@ function PaymentResultPage() {
     if (successToken) {
       const commitPayment = async (token) => {
         try {
-          const res = await axios.post('http://localhost:5000/api/commit', { token });
+          const res = await axios.post(`${API_URL}/api/commit`, { token });
           setResult(res.data);
         } catch (err) {
           setError(err.response?.data?.error || err.message || 'Error al confirmar el pago');

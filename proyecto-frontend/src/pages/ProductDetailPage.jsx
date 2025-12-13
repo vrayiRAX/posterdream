@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useCart } from '../context/CartContext'; // 1. ¡Importamos el hook del Cerebro!
+import { API_URL } from '../config';
 
 function ProductDetailPage() {
   let { id } = useParams();
@@ -16,7 +17,7 @@ function ProductDetailPage() {
   useEffect(() => {
     const fetchProducto = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/productos/${id}`);
+        const res = await fetch(`${API_URL}/api/productos/${id}`);
         if (!res.ok) throw new Error('Producto no encontrado');
         const data = await res.json();
         setProducto(data);

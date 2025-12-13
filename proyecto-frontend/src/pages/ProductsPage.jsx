@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { API_URL } from '../config';
 
 // 1. ¡Importamos los 3 componentes!
 import Header from '../components/Header';
@@ -11,7 +12,7 @@ function App() {
 
   // Esta lógica de traer datos del backend NO cambia
   useEffect(() => {
-    fetch('http://localhost:5000/api/productos')
+    fetch(`${API_URL}/api/productos`)
       .then(response => response.json())
       .then(data => {
         setProductos(data);

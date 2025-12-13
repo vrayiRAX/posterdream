@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_URL } from '../config';
 
 // 1. Creamos el contexto
 const CartContext = createContext();
@@ -24,7 +25,7 @@ export const CartProvider = ({ children }) => {
     }
     
     try {
-      const res = await fetch('http://localhost:5000/api/carrito', {
+      const res = await fetch(`${API_URL}/api/carrito`, {
         headers: { 'x-auth-token': token }
       });
       if (!res.ok) {
@@ -52,7 +53,7 @@ export const CartProvider = ({ children }) => {
     }
 
     try {
-      const res = await fetch('http://localhost:5000/api/carrito/agregar', {
+      const res = await fetch(`${API_URL}/api/carrito/agregar`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -30,12 +30,12 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/posterdre
 .catch(err => console.error('❌ Error conectando a MongoDB:', err));
 
 // 3. Importar rutas (ajusta según tu estructura)
-const authRoutes = require('./routes/auth');
-const productoRoutes = require('./routes/productos');
-const carritoRoutes = require('./routes/carrito');
-const blogRoutes = require('./routes/blogs');
-const userRoutes = require('./routes/users');
-const paymentRoutes = require('./routes/payment');
+const authRoutes = require('./Routes/auth');
+const productoRoutes = require('./Routes/productos');
+const carritoRoutes = require('./Routes/carrito');
+const blogRoutes = require('./Routes/blogs');
+const userRoutes = require('./Routes/users');
+const paymentRoutes = require('./Routes/payment');
 
 // 4. Usar rutas
 app.use('/api/auth', authRoutes);

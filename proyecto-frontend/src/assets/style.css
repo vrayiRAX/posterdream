@@ -1463,3 +1463,142 @@ main {
         font-size: 14px;
     }
 }
+/* ==================================
+   NUEVOS ESTILOS PARA PROFILE PAGE
+   ================================== */
+
+.profile-wrapper {
+    width: 100%;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 160px);
+}
+
+.profile-card {
+    background: rgba(255, 255, 255, 0.95);
+    width: 100%;
+    max-width: 800px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    position: relative;
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Encabezado decorativo morado */
+.profile-header-bg {
+    background: linear-gradient(135deg, #572364 0%, #842593 100%);
+    height: 100px; /* <-- CAMBIO AQUÍ: Antes era 150px, ahora es 100px */
+    width: 100%;
+    position: relative;
+}
+
+.profile-content {
+    padding: 0 40px 40px 40px;
+    text-align: center;
+    margin-top: -75px;
+}
+
+/* Avatar circular grande */
+.profile-avatar {
+    width: 150px;
+    height: 150px;
+    background-color: #f0f2f5;
+    border: 5px solid white;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    color: #572364;
+    font-size: 64px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.profile-name {
+    color: #572364;
+    font-size: 2.5rem;
+    margin-bottom: 5px;
+    font-weight: 700;
+}
+
+.profile-role-badge {
+    display: inline-block;
+    background-color: #842593;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Grilla de información más grande */
+.profile-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    text-align: left;
+    background-color: #f9f9f9;
+    padding: 30px;
+    border-radius: 12px;
+    border: 1px solid #eee;
+}
+
+.profile-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-label {
+    color: #888;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.profile-value {
+    color: #333;
+    font-size: 1.2rem;
+    font-weight: 500;
+    word-break: break-all;
+}
+
+/* Botones de acción (Opcional por si agregas editar después) */
+.profile-actions {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.btn-profile-action {
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: transform 0.2s;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-secondary {
+    background-color: #e4e6eb;
+    color: #333;
+}
+.btn-secondary:hover { background-color: #d8dadf; }
+
+@media (max-width: 600px) {
+    .profile-content { padding: 0 20px 30px; }
+    .profile-info-grid { grid-template-columns: 1fr; }
+    .profile-avatar { width: 120px; height: 120px; font-size: 48px; }
+    .profile-name { font-size: 2rem; }
+}

@@ -24,7 +24,7 @@ const ProfilePage = () => {
                 setLoading(false);
             } catch (error) {
                 console.error("Error al cargar perfil:", error);
-                localStorage.removeItem('token'); // Token inválido o expirado
+                localStorage.removeItem('token'); 
                 navigate('/login');
             }
         };
@@ -32,23 +32,71 @@ const ProfilePage = () => {
     }, [navigate]);
 
     if (loading) {
-        return <main className="cart-outer" style={{ color: 'white' }}><h1>Cargando perfil...</h1></main>;
+        return (
+            <main className="profile-wrapper">
+                <h1 style={{color: 'white'}}>Cargando perfil...</h1>
+            </main>
+        );
     }
 
     if (!user) {
-        return <main className="cart-outer" style={{ color: 'white' }}><h1>Perfil no encontrado.</h1></main>;
+        return (
+            <main className="profile-wrapper">
+                <h1 style={{color: 'white'}}>Perfil no encontrado.</h1>
+            </main>
+        );
     }
 
+    const initial = user.nombre ? user.nombre.charAt(0).toUpperCase() : '?';
+
     return (
-        <main className="cart-outer" style={{ color: 'white' }}>
-            <div className="cart-super-container">
-                <h1>👤 Mi Perfil</h1>
-                <div className="profile-details" style={{ backgroundColor: '#222', padding: '30px', borderRadius: '8px', maxWidth: '400px', margin: '20px auto' }}>
-                    <p><strong>Nombre:</strong> {user.nombre}</p>
-                    <p><strong>Email:</strong> {user.email}</p>
-                    <p><strong>RUT:</strong> {user.rut}</p>
-                    <p><strong>Dirección:</strong> {user.direccion}</p>
-                    <p><strong>Rol:</strong> {user.isAdmin ? 'Administrador' : 'Cliente'}</p>
+        <main className="profile-wrapper">
+            <div className="profile-card">
+                {/* Fondo decorativo superior */}
+                <div className="profile-header-bg"></div>
+
+                <div className="profile-content">
+                    {/* Avatar Circular */}
+                    <div className="profile-avatar">
+                        {initial}
+                    </div>
+
+                    <h1 className="profile-name">{user.nombre}</h1>
+                    <span className="profile-role-badge">
+                        {user.isAdmin ? 'Administrador' : 'Cliente Verificado'}
+                    </span>
+
+                    <div className="profile-info-grid">
+                        <div className="profile-field">
+                            <span className="profile-label">Correo Electrónico</span>
+                            <span className="profile-value">{user.email}</span>
+                        </div>
+
+                        <div className="profile-field">
+                            <span className="profile-label">RUT / Identificación</span>
+                            <span className="profile-value">{user.rut || 'No registrado'}</span>
+                        </div>
+
+                        <div className="profile-field">
+                            <span className="profile-label">Dirección de Envío</span>
+                            <span className="profile-value">{user.direccion || 'Sin dirección registrada'}</span>
+                        </div>
+                        
+                        <div className="profile-field">
+                            <span className="profile-label">ID de Usuario</span>
+                            <span className="profile-value">#{user._id ? user._id.slice(-6).toUpperCase() : 'N/A'}</span>
+                        </div>
+                    </div>
+
+                    <div className="profile-actions">
+                        {/* BOTÓN ACTUALIZADO: Redirige a '/' (HomePage) */}
+                        <button 
+                            className="btn-profile-action btn-secondary" 
+                            onClick={() => navigate('/Home')} 
+                        >
+                            Volver al Inicio
+                        </button>
+                    </div>
                 </div>
             </div>
         </main>

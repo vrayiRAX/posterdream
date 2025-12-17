@@ -1490,7 +1490,7 @@ main {
 /* Encabezado decorativo morado */
 .profile-header-bg {
     background: linear-gradient(135deg, #572364 0%, #842593 100%);
-    height: 100px; /* <-- CAMBIO AQUÍ: Antes era 150px, ahora es 100px */
+    height: 100px;
     width: 100%;
     position: relative;
 }

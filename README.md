@@ -19,3 +19,4 @@ Proyecto final para la asignatura de Desarrollo Full Stack. Aplicación web para
 ## 👤 Autores
 - Vicente Placencia (ZorVaK749)
 - Ian Badilla (VrayiRAX)
+...

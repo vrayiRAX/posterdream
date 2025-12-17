@@ -1,4 +1,6 @@
-/* ADMIN */
+/* ====================================
+   ADMIN.CSS - Panel de Administración
+   ==================================== */
 
 /* Contenedor principal del admin */
 .admin-main {
@@ -7,32 +9,48 @@
     align-items: flex-start;
     justify-content: flex-start;
     gap: 0;
-    min-height: calc(100vh - 5rem - 64px);
+    min-height: calc(100vh - 200px);
     max-width: 1200px;
     margin: 40px auto;
     background-color: #ffffff;
     border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
     overflow: hidden;
     position: relative;
-    z-index: 100; /* Z-index alto para estar sobre el fondo */
+    z-index: 999;
 }
 
-/* Sidebar */
+/* Asegurar que el admin-main tenga fondo opaco completo */
+.admin-main::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ffffff;
+    z-index: -1;
+}
+
+/* ====================================
+   SIDEBAR
+   ==================================== */
 .sidebar {
     width: 280px;
     flex-shrink: 0;
-    background-color: #fafafa;
+    background-color: #f5f5f5;
     padding: 25px;
-    border-right: 1px solid #ddd;
-    height: auto;
+    border-right: 2px solid #e0e0e0;
+    min-height: 500px;
+    position: relative;
 }
 
 .sidebar h2 {
     color: #572364;
     text-align: center;
-    margin-bottom: 20px;
-    font-size: 1.5rem;
+    margin-bottom: 30px;
+    font-size: 1.6rem;
+    font-weight: 700;
 }
 
 .sidebar ul {
@@ -42,94 +60,129 @@
 }
 
 .sidebar ul li {
-    margin-bottom: 5px;
+    margin-bottom: 8px;
 }
 
 .sidebar ul li a {
     display: block;
-    padding: 15px 10px;
+    padding: 15px 12px;
     color: #333;
     text-decoration: none;
-    font-size: 1.1rem;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    border-radius: 5px;
+    font-size: 1.05rem;
+    transition: all 0.3s ease;
+    border-radius: 6px;
+    font-weight: 500;
 }
 
-.sidebar ul li a:hover,
+.sidebar ul li a:hover {
+    background-color: #842593;
+    color: white;
+    transform: translateX(5px);
+}
+
 .sidebar ul li a.active {
     background-color: #572364;
     color: white;
+    box-shadow: 0 2px 8px rgba(87, 35, 100, 0.3);
 }
 
-/* Contenido principal del admin */
+/* ====================================
+   CONTENIDO PRINCIPAL
+   ==================================== */
 .admin-content {
     flex-grow: 1;
     padding: 40px;
     background-color: #ffffff;
-    height: 100%;
-    overflow-y: auto;
+    min-height: 500px;
+    position: relative;
 }
 
-.admin-content h1,
+.admin-content h1 {
+    color: #572364;
+    margin-bottom: 10px;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
 .admin-content h2 {
     color: #333;
     margin-bottom: 20px;
-    border-bottom: 2px solid #ddd;
+    margin-top: 30px;
+    border-bottom: 2px solid #e0e0e0;
     padding-bottom: 10px;
+    font-size: 1.5rem;
 }
 
-/* Botones del admin */
+.admin-content p {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+/* ====================================
+   BOTONES
+   ==================================== */
 .admin-btn {
     background-color: #572364;
     color: white;
-    padding: 10px 15px;
+    padding: 12px 24px;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
     font-size: 1rem;
+    font-weight: 600;
     margin-bottom: 20px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-right: 10px;
+    transition: all 0.3s ease;
 }
 
 .admin-btn:hover {
     background-color: #842593;
     transform: translateY(-2px);
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(87, 35, 100, 0.3);
 }
 
-/* Formularios del admin */
+.admin-btn:active {
+    transform: translateY(0);
+}
+
+/* ====================================
+   FORMULARIOS
+   ==================================== */
 .admin-form {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    max-width: 600px;
+    gap: 20px;
+    max-width: 700px;
     margin-bottom: 40px;
+    background-color: #fafafa;
+    padding: 25px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
 }
 
 .admin-form label {
-    font-weight: bold;
-    color: #555;
+    font-weight: 600;
+    color: #333;
     margin-bottom: 5px;
+    font-size: 0.95rem;
 }
 
 .admin-form input[type="text"],
 .admin-form input[type="number"],
 .admin-form input[type="email"],
 .admin-form input[type="password"],
+.admin-form input[type="file"],
 .admin-form textarea,
 .admin-form select {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
     font-size: 1rem;
     background-color: #ffffff;
     box-sizing: border-box;
-}
-
-.admin-form textarea {
-    resize: vertical;
-    min-height: 100px;
+    transition: border-color 0.3s ease;
 }
 
 .admin-form input:focus,
@@ -137,54 +190,86 @@
 .admin-form select:focus {
     outline: none;
     border-color: #572364;
-    box-shadow: 0 0 0 2px rgba(87, 35, 100, 0.1);
+    box-shadow: 0 0 0 3px rgba(87, 35, 100, 0.1);
 }
 
-/* Contenedor de tabla */
+.admin-form textarea {
+    resize: vertical;
+    min-height: 120px;
+    font-family: inherit;
+}
+
+/* ====================================
+   TABLAS
+   ==================================== */
 .table-container {
-    max-height: 500px;
+    max-height: 600px;
     overflow-y: auto;
+    overflow-x: auto;
     margin-top: 20px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
 }
 
-/* Tablas */
 table {
     width: 100%;
     border-collapse: collapse;
-    background-color: white;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
 }
 
-th, td {
-    padding: 12px 15px;
+thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+th {
+    padding: 15px;
     text-align: left;
-    border-bottom: 1px solid #ddd;
-}
-
-thead tr {
     background-color: #572364;
     color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+    color: #333;
+}
+
+tbody tr {
+    transition: background-color 0.2s ease;
 }
 
 tbody tr:hover {
     background-color: #f5f5f5;
 }
 
-/* Botones de acción en tablas */
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ====================================
+   BOTONES DE ACCIÓN EN TABLAS
+   ==================================== */
 .acciones-btn {
-    padding: 5px 10px;
+    padding: 6px 12px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 0.9rem;
+    font-weight: 500;
     margin-right: 5px;
-    transition: opacity 0.2s ease;
+    transition: all 0.2s ease;
 }
 
 .acciones-btn:hover {
-    opacity: 0.8;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .edit-btn {
@@ -192,52 +277,50 @@ tbody tr:hover {
     color: white;
 }
 
+.edit-btn:hover {
+    background-color: #1976D2;
+}
+
 .delete-btn {
     background-color: #f44336;
     color: white;
 }
 
-/* ==== CONTROL DEL FONDO ==== */
-/* Si tienes un fondo de pósters, este debe tener z-index bajo */
-body {
-    position: relative;
-    overflow-x: hidden;
+.delete-btn:hover {
+    background-color: #d32f2f;
 }
 
-/* Fondo de pósters (debe estar en el body o un contenedor principal) */
-.background-posters,
-.layout-con-fondo {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0 !important;
-    pointer-events: none;
+/* ====================================
+   MENSAJES Y ALERTAS
+   ==================================== */
+.alert {
+    padding: 15px 20px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-weight: 500;
 }
 
-/* Filtro oscuro sobre el fondo */
-.layout-filtro-oscuro {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    z-index: 1 !important;
-    pointer-events: none;
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
 }
 
-/* Asegurar que el contenido principal esté sobre el fondo */
-main,
-.main-content,
-header,
-footer {
-    position: relative;
-    z-index: 10;
+.alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
 }
 
-/* ==== RESPONSIVE ==== */
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+/* ====================================
+   RESPONSIVE
+   ==================================== */
 @media (max-width: 768px) {
     .admin-main {
         flex-direction: column;
@@ -247,18 +330,30 @@ footer {
     .sidebar {
         width: 100%;
         border-right: none;
-        border-bottom: 1px solid #ddd;
+        border-bottom: 2px solid #e0e0e0;
+        min-height: auto;
     }
 
     .sidebar ul {
         display: flex;
         justify-content: space-around;
         flex-wrap: wrap;
-        padding-bottom: 10px;
+        gap: 10px;
     }
 
     .sidebar ul li {
-        margin-bottom: 10px;
+        flex: 1 1 auto;
+        min-width: 120px;
+    }
+
+    .sidebar ul li a {
+        text-align: center;
+        padding: 12px 8px;
+        font-size: 0.95rem;
+    }
+
+    .sidebar ul li a:hover {
+        transform: none;
     }
 
     .admin-content {
@@ -267,33 +362,65 @@ footer {
 
     .admin-form {
         max-width: 100%;
+        padding: 20px;
     }
 
     .table-container {
-        overflow-x: auto;
+        max-height: 400px;
+    }
+
+    table {
+        font-size: 0.9rem;
+    }
+
+    th, td {
+        padding: 10px 8px;
+    }
+
+    .acciones-btn {
+        padding: 5px 8px;
+        font-size: 0.85rem;
     }
 }
 
 @media (max-width: 480px) {
     .admin-main {
         margin: 10px 5px;
+        border-radius: 8px;
     }
 
     .admin-content {
         padding: 15px;
     }
 
+    .admin-content h1 {
+        font-size: 1.5rem;
+    }
+
+    .admin-content h2 {
+        font-size: 1.2rem;
+    }
+
     .sidebar {
         padding: 15px;
     }
 
-    th, td {
-        padding: 8px 10px;
-        font-size: 0.9rem;
+    .sidebar h2 {
+        font-size: 1.3rem;
     }
 
-    .acciones-btn {
-        padding: 4px 8px;
-        font-size: 0.8rem;
+    .admin-form {
+        padding: 15px;
+        gap: 15px;
+    }
+
+    .admin-btn {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    th, td {
+        padding: 8px 5px;
+        font-size: 0.85rem;
     }
 }
